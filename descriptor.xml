@@ -1,0 +1,16 @@
+<app>
+  <id>hs-boxee-app</id>
+  <name>HockeyStreams</name>
+  <version>1.0</version>
+  <description>Your Live and Archived Hockey Destination</description>
+  <thumb>http://usera.ImageCave.com/peachey777/icon.png</thumb>
+  <repository>http://dir.boxee.tv/apps</repository>
+  <media>video</media>
+  <copyright>HockeyStreams</copyright>
+  <email>peachey777@gmail.com</email>
+  <type>skin</type>
+  <startWindow>start</startWindow>
+  <platform>all</platform>
+  <minversion>0.9.22</minversion>
+  <test-app>true</test-app>
+</app>
