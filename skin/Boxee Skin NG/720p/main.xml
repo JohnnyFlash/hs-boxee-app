@@ -2,6 +2,7 @@
 <window type="window" id="14000">
 	<onload lang="python"><![CDATA[
 import datetime
+import helper
 dateFormatted = datetime.datetime.now().strftime("%m/%d/%Y")
 mc.GetApp().GetLocalConfig().SetValue("onDemandDate", dateFormatted)
 ]]>
@@ -37,8 +38,7 @@ mc.GetApp().GetLocalConfig().SetValue("onDemandDate", dateFormatted)
                   <texturefocus>ba_overlay.png</texturefocus>
                   <texturenofocus>ba_overlay2.png</texturenofocus>
                   <onclick lang="python"><![CDATA[
-items = mc.GetDirectory('rss://www4.hockeystreams.com/rss/roku_live.php')
-mc.GetActiveWindow().GetList(120).SetItems(items)
+helper.updateLiveList()
 ]]>
 </onclick>
               </control>
@@ -55,8 +55,9 @@ mc.GetActiveWindow().GetList(120).SetItems(items)
                   <texturefocus>ba_overlay.png</texturefocus>
                   <texturenofocus>ba_overlay2.png</texturenofocus>
                   <onclick lang="python"><![CDATA[
-items = mc.GetDirectory('rss://www4.hockeystreams.com/rss/roku_demand.php?date=' + mc.GetApp().GetLocalConfig().GetValue("onDemandDate"))
-mc.GetActiveWindow().GetList(120).SetItems(items)
+helper.updateOnDemand(mc.GetApp().GetLocalConfig().GetValue("onDemandDate"))
+#items = mc.GetDirectory('rss://www4.hockeystreams.com/rss/roku_demand.php?date=' + mc.GetApp().GetLocalConfig().GetValue("onDemandDate"))
+#mc.GetActiveWindow().GetList(120).SetItems(items)
 ]]>
 </onclick>
               </control>
@@ -84,8 +85,10 @@ mc.GetActiveWindow().GetList(120).SetItems(items)
                 <texturenofocus>ba_overlay2.png</texturenofocus>
 				<ontextchange lang="python">
 <![CDATA[
-mc.GetApp().GetLocalConfig().SetValue("onDemandDate", mc.GetActiveWindow().GetEdit(302).GetText())
-mc.GetActiveWindow().GetLabel(303).SetLabel(mc.GetApp().GetLocalConfig().GetValue("onDemandDate"))
+date = mc.GetActiveWindow().GetEdit(302).GetText()
+mc.GetApp().GetLocalConfig().SetValue("onDemandDate", date)
+helper.updateOnDemand(date)
+mc.GetActiveWindow().GetLabel(303).SetLabel(date)
 ]]>
 			    </ontextchange>
 			</control>
