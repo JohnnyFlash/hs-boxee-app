@@ -5,6 +5,7 @@ import datetime
 import helper
 dateFormatted = datetime.datetime.now().strftime("%m/%d/%Y")
 mc.GetApp().GetLocalConfig().SetValue("onDemandDate", dateFormatted)
+mc.GetActiveWindow().GetLabel(303).SetLabel(dateFormatted)
 ]]>
 	</onload>
    <defaultcontrol always="true">120</defaultcontrol>
@@ -56,8 +57,6 @@ helper.updateLiveList()
                   <texturenofocus>ba_overlay2.png</texturenofocus>
                   <onclick lang="python"><![CDATA[
 helper.updateOnDemand(mc.GetApp().GetLocalConfig().GetValue("onDemandDate"))
-#items = mc.GetDirectory('rss://www4.hockeystreams.com/rss/roku_demand.php?date=' + mc.GetApp().GetLocalConfig().GetValue("onDemandDate"))
-#mc.GetActiveWindow().GetList(120).SetItems(items)
 ]]>
 </onclick>
               </control>
@@ -74,23 +73,20 @@ helper.updateOnDemand(mc.GetApp().GetLocalConfig().GetValue("onDemandDate"))
 				<label>On-Demand Date (MM/DD/YYYY)</label>
 				<textcolor>ffbdbdbd</textcolor>
 			  </control>
-			  <control type="edit" id="302">
+			  <control type="button" id="302">
 				<height>40</height>
 				<width>125</width>
 				<label>Set Date</label>
 				<align>center</align>
+                <textoffsety>7</textoffsety>
 				<font>font21b</font>
 				<textcolor>ffbdbdbd</textcolor>
 				<texturefocus>ba_overlay.png</texturefocus>
                 <texturenofocus>ba_overlay2.png</texturenofocus>
-				<ontextchange lang="python">
-<![CDATA[
-date = mc.GetActiveWindow().GetEdit(302).GetText()
-mc.GetApp().GetLocalConfig().SetValue("onDemandDate", date)
-helper.updateOnDemand(date)
-mc.GetActiveWindow().GetLabel(303).SetLabel(date)
+				<onclick lang="python"><![CDATA[
+helper.updateDateList()
 ]]>
-			    </ontextchange>
+</onclick>
 			</control>
 			<control type="label" id="303">
 				<height>40</height>
@@ -178,19 +174,31 @@ mc.GetActiveWindow().GetLabel(303).SetLabel(date)
                </focusedlayout>
                <content type="action">
                   <onclick lang="python"><![CDATA[
+import time
 from urllib import quote_plus, urlencode
 list = mc.GetActiveWindow().GetList(120)
 item = list.GetItem(list.GetFocusedItem())
 title = item.GetLabel()
-url = item.GetPath()
-params = { 'quality':'1' }
-playlist_url = "playlist://%s?%s" % (quote_plus(url), urlencode(params))
-print playlist_url
-item = mc.ListItem(mc.ListItem.MEDIA_VIDEO_EPISODE)
-item.SetPath(playlist_url)
-item.SetLabel(title)
-item.SetContentType = 'application/vnd.apple.mpegurl'
-mc.GetPlayer().Play(item)
+
+while True:
+	try:
+		t = time.strptime(title, "%m/%d/%Y")
+		date = "%02d/%02d/%04d" % (t[1], t[2], t[0])
+		mc.GetApp().GetLocalConfig().SetValue("onDemandDate", date)
+		helper.updateOnDemand(date)
+		mc.GetActiveWindow().GetLabel(303).SetLabel(date)
+		break
+	except ValueError:
+		url = item.GetPath()
+		params = { 'quality':'1' }
+		playlist_url = "playlist://%s?%s" % (quote_plus(url), urlencode(params))
+		print playlist_url
+		item = mc.ListItem(mc.ListItem.MEDIA_VIDEO_EPISODE)
+		item.SetPath(playlist_url)
+		item.SetLabel(title)
+		item.SetContentType = 'application/vnd.apple.mpegurl'
+		mc.GetPlayer().Play(item)
+		break
 ]]></onclick>
                </content>
             </control>
